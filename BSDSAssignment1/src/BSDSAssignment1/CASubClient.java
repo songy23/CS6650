@@ -19,11 +19,10 @@ public class CASubClient {
     public static void main(String[] args) {
 
         String host = (args.length < 1) ? null : args[0];
-        Scanner scan = new Scanner(System.in);
+//        Scanner scan = new Scanner(System.in);
 //        System.out.println("Please specify how many subscribers you want: ");
 //        int threadNum = scan.nextInt();
-        int threadNum = 2;
-        String[] topics = new String[]{"News", "Soccer"};
+        int threadNum = 10;
         for (int i = 0; i < threadNum; i++) {
 //            System.out.println("Please enter a topic for subscriber " + i + ": ");
 //            try {
@@ -32,7 +31,7 @@ public class CASubClient {
 //                e.printStackTrace();
 //            }
 //            String topic = scan.nextLine();
-            SubClientThread thread = new SubClientThread(topics[i], host);
+            SubClientThread thread = new SubClientThread("Topic" + i, host);
             new Thread(thread).start();
         }
     }
@@ -54,6 +53,7 @@ class SubClientThread implements Runnable {
         try {
             Registry registry = LocateRegistry.getRegistry(this.host);
             BSDSSubscribeInterface CAServerStub = (BSDSSubscribeInterface) registry.lookup("CAServerSubscriber");
+            long startTime = System.currentTimeMillis();
 
             int id = CAServerStub.registerSubscriber(this.topic);
 //            System.out.println("Subscriber id = " + Integer.toString(id));
@@ -67,11 +67,13 @@ class SubClientThread implements Runnable {
                 if (message == null) {
                     Thread.sleep(INITIAL_WAITING_TIME * factor);
                     factor *= 2;
+
+                    System.out.println("Thread " + Thread.currentThread().getId() + " runs for " + Long.toString(System.currentTimeMillis() - startTime));
                 } else {
                     messageCount++;
 //                    System.out.println("Thread " + Thread.currentThread().getId() + " received " + messageCount + " messages");
                     if (messageCount % 1000 == 0) {
-                        System.out.println("Thread " + Thread.currentThread().getId() + " received " + messageCount + " messages");
+                        System.out.println("Subscriber Thread " + Thread.currentThread().getId() + " received " + messageCount + " messages");
                     }
                     factor = 1;
                 }

@@ -129,6 +129,7 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface {
             System.out.println("CAServer ready");
             Timer timer = new Timer();
             timer.schedule(new deleteOutdatedMessages(), 0, 5000);
+            timer.schedule(new sizeMonitor(), 0, 1000);
         } catch (Exception e) {
             System.err.println("Server exception: " + e.toString());
             e.printStackTrace();
@@ -144,11 +145,11 @@ class deleteOutdatedMessages extends TimerTask {
 
     @Override
     public void run() {
-        System.out.println("Current seconds: " + counter);
+//        System.out.println("Current seconds: " + counter);
         Map<String, LinkedList<BSDSContent>> messagesByTopic = CAServer.getMessagesByTopic();
         for (String topic : messagesByTopic.keySet()) {
             LinkedList<BSDSContent> messages = messagesByTopic.get(topic);
-            System.out.println("Topic: " + topic + " has " + messages.size() + " messages.");
+//            System.out.println("Topic: " + topic + " has " + messages.size() + " messages.");
             synchronized (messages) {
                 while (!messages.isEmpty() && messages.peek().getTimeToLIve() < System.currentTimeMillis()) {
                     messages.poll();
@@ -156,5 +157,21 @@ class deleteOutdatedMessages extends TimerTask {
             }
         }
         counter += 5;
+    }
+}
+
+class sizeMonitor extends TimerTask {
+
+    private static int counter = 0;
+
+    @Override
+    public void run() {
+        System.out.println("Current seconds: " + counter);
+        Map<String, LinkedList<BSDSContent>> messagesByTopic = CAServer.getMessagesByTopic();
+        for (String topic : messagesByTopic.keySet()) {
+            System.out.print("Topic: " + topic + " has " + messagesByTopic.get(topic).size() + " messages;  ");
+        }
+        System.out.print('\n');
+        counter += 1;
     }
 }

@@ -13,13 +13,11 @@ public class CAPubClient {
 
     public static void main(String[] args) {
         String host = (args.length < 1) ? null : args[0];
-        Scanner scan = new Scanner(System.in);
+//        Scanner scan = new Scanner(System.in);
 //        System.out.println("Please specify how many publishers you want: ");
 //        int threadNum = scan.nextInt();
-        int threadNum = 4;
-        String[] topics = new String[]{"News", "News", "Soccer", "Junk"};
-        String[] names = new String[]{"Pub1", "Pub2", "Pub3", "Pub4"};
-        int[] messageNums = new int[]{10000, 10000, 10000, 10000};
+        int threadNum = 20;
+
         for (int i = 0; i < threadNum; i++) {
 
 //            System.out.println("Please enter a topic for publisher " + i + " : ");
@@ -28,7 +26,7 @@ public class CAPubClient {
 //            String name = scan.nextLine();
 //            System.out.println("Please specify how many messages this publisher should send: ");
 //            int messageNum = scan.nextInt();
-            PubClientThread thread = new PubClientThread(topics[i], names[i], messageNums[i], host);
+            PubClientThread thread = new PubClientThread("Topic" + i / 2, "Pub" + i, 10000, host);
 
             new Thread(thread).start();
         }
@@ -53,6 +51,7 @@ class PubClientThread implements Runnable {
     @Override
     public void run() {
         try {
+            long startTime = System.currentTimeMillis();
 //            System.out.println ("Publisher Client Starter");
             Registry registry = LocateRegistry.getRegistry(this.host, 1099);
 //            System.out.println ("Connected to registry");
@@ -67,6 +66,7 @@ class PubClientThread implements Runnable {
                 CAServerStub.publishContent(id, randomMessage.getTitle(), randomMessage.getMessage(), System.currentTimeMillis() + 1000 * TIME_TO_LIVE);
             }
 
+            System.out.println("Publisher Thread " + Thread.currentThread().getId() + " runs for " + Long.toString(System.currentTimeMillis() - startTime));
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();

@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-ear" name="BSDSAssignment2:ear exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/BSDSAssignment2_ear_exploded</output-path>
+    <root id="root">
+      <element id="directory" name="web.war">
+        <element id="artifact" artifact-name="BSDSAssignment2:war exploded" />
+      </element>
+      <element id="directory" name="ejb.jar">
+        <element id="artifact" artifact-name="BSDSAssignment2:ejb exploded" />
+      </element>
+    </root>
+  </artifact>
+</component>

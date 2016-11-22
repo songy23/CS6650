@@ -82,7 +82,7 @@ class SubClientThread implements Runnable {
                     factor *= 2;
                     if (startTime != null) {
                         System.out.println("Subscriber " + id + " runs for " + Long.toString(System.currentTimeMillis() - startTime));
-                        break; // thread exits
+//                        break; // thread exits
                     }
                 } else {
                     messageCount++;

@@ -27,7 +27,7 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface {
 
     private static final Set<String> STOP_WORDS = new HashSet<String>();
     static {
-        File stopWords = new File("stop_words");
+        File stopWords = new File("/Users/songyang/Documents/CS6650/CS6650/BSDSAssignment2/src/main/java/Server/stop_words");
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new FileReader(stopWords));

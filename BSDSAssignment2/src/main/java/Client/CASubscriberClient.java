@@ -79,8 +79,8 @@ class SubClientThread implements Runnable {
                 if (message == null || message.length() == 0) {
                     Thread.sleep(INITIAL_WAITING_TIME * factor);
                     factor *= 2;
-                    if (startTime != null) {
-//                        System.out.println("Subscriber " + id + " runs for " + Long.toString(System.currentTimeMillis() - startTime));
+                    if (startTime != null && factor == 2) {
+                        System.out.println("Subscriber " + id + " runs for " + Long.toString(System.currentTimeMillis() - startTime));
 //                        break; // thread exits
                     }
                 } else {

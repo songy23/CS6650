@@ -6,13 +6,12 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Random;
 
 /**
  * Created by songyang on 11/20/16.
  */
 public class CASubscriberClient {
-    private static String serverURI = "http://localhost:8080/BSDSAssignment2_war_exploded/api/BSDS/";
+    private static final String serverURI = "http://localhost:8080/BSDSAssignment2_war_exploded/api/BSDS/";
 
     public static int register(String topic) {
         Client client = ClientBuilder.newClient();
@@ -59,9 +58,9 @@ public class CASubscriberClient {
 }
 
 class SubClientThread implements Runnable {
+    private static final int INITIAL_WAITING_TIME = 100; // Milliseconds
     private String topic;
     private int id;
-    private static final int INITIAL_WAITING_TIME = 100; // Milliseconds
 
     public SubClientThread(String topic) {
         this.topic = topic;
@@ -81,7 +80,7 @@ class SubClientThread implements Runnable {
                     Thread.sleep(INITIAL_WAITING_TIME * factor);
                     factor *= 2;
                     if (startTime != null) {
-                        System.out.println("Subscriber " + id + " runs for " + Long.toString(System.currentTimeMillis() - startTime));
+//                        System.out.println("Subscriber " + id + " runs for " + Long.toString(System.currentTimeMillis() - startTime));
 //                        break; // thread exits
                     }
                 } else {

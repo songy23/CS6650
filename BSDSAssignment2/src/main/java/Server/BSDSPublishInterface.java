@@ -1,6 +1,7 @@
 package Server;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import java.util.List;
 
 /**
@@ -26,6 +27,6 @@ public interface BSDSPublishInterface {
     // get the most N popular terms from all topics.
     @Path("/publisher/popularTerms/{n}")
     @GET
-    @Produces({"application/xml", "text/html"})
-    List<String> getMostPopularTerms(@PathParam("n") int n);
+    @Produces(MediaType.TEXT_PLAIN)
+    String getMostPopularTerms(@PathParam("n") int n);
 }

@@ -3,15 +3,14 @@ package Server;
 import JDBC.WordFrequencyDAO;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.MediaType;
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
-import java.io.BufferedReader;
-import java.io.File;
 
 /**
  * Created by songyang on 11/14/16.
@@ -20,12 +19,13 @@ import java.io.File;
 @Path("/BSDS")
 public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface {
 
+    private static final Set<String> STOP_WORDS = new HashSet<String>();
     private static Map<String, ArrayList<BSDSContent>> messagesByTopic = new ConcurrentHashMap<String, ArrayList<BSDSContent>>();
     private static Map<Integer, Pair> subscriberidToTopicPositionMap = new HashMap<Integer, Pair>();  // don't need to be concurrent
     private static Map<Integer, String> publisheridToTopicMap = new HashMap<Integer, String>();
-    private WordFrequencyDAO wordFrequencyDAO = WordFrequencyDAO.getInstance();
+    private static Integer publisherID = 0;
+    private static Integer subscriberID = 0;
 
-    private static final Set<String> STOP_WORDS = new HashSet<String>();
     static {
         File stopWords = new File("/Users/songyang/Documents/CS6650/CS6650/BSDSAssignment2/src/main/java/Server/stop_words");
         BufferedReader reader = null;
@@ -48,8 +48,7 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface {
 
     }
 
-    private static Integer publisherID = 0;
-    private static Integer subscriberID = 0;
+    private WordFrequencyDAO wordFrequencyDAO = WordFrequencyDAO.getInstance();
 
     @Path("/publisher/{topic}")
     @POST
@@ -87,14 +86,13 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface {
             messages.add(content);
         }
 
-//        wordFrequencyCounter(message);
+        wordFrequencyCounter(message);
     }
 
     @Path("/subscriber/{topic}")
     @POST
     @Produces(value = "text/plain")
     public String registerSubscriber(@PathParam("topic") String topic) {
-//        System.out.println("Subscriber " + (subscriberID + 1) + " Topic is  " + topic);
         synchronized (subscriberID) {
             subscriberID++;
             Pair pair = new Pair(topic, 0);
@@ -131,11 +129,11 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface {
     }
 
     // get the most N popular terms from all topics.
-    @Path("/publisher/popularTerms/{n}")
+    @Path("/popularTerms/{n}")
     @GET
-    @Produces({"application/xml", "text/html"})
-    public List<String> getMostPopularTerms(@PathParam("n") int n) {
-        List<String> terms = null;
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getMostPopularTerms(@PathParam("n") int n) {
+        String terms = null;
         try {
             terms = wordFrequencyDAO.getTopNPopularWords(n);
         } catch (SQLException e) {
@@ -144,7 +142,10 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface {
         return terms;
     }
 
-    private void wordFrequencyCounter(String message) {
+    //    @Path("/publisher/counter")
+//    @POST
+//    @Consumes(value = "text/plain")
+    public void wordFrequencyCounter(String message) {
         String[] words = message.split(" ");
         for (String word : words) {
             if (word.length() == 0 || STOP_WORDS.contains(word)) {
@@ -158,11 +159,6 @@ public class CAServer implements BSDSPublishInterface, BSDSSubscribeInterface {
             }
         }
     }
-
-//    public static void main(String[] args) {
-//        System.out.println(Response.ok("a").build());
-//    }
-
 }
 
 /**
@@ -172,7 +168,9 @@ class Pair {
     String topic;
     int position;
 
-    public Pair() {}
+    public Pair() {
+    }
+
     public Pair(String s, int p) {
         this.topic = s;
         this.position = p;

@@ -115,12 +115,12 @@ public class WordFrequencyDAO {
         }
     }
 
-    public List<String> getTopNPopularWords(int num) throws SQLException {
+    public String getTopNPopularWords(int num) throws SQLException {
         String getTopNPopularWords = "SELECT word FROM WordFrequency ORDER BY frequency DESC LIMIT ?;";
         Connection connection = null;
         PreparedStatement selectStmt = null;
         ResultSet results = null;
-        List<String> words = new ArrayList<String>();
+        StringBuilder words = new StringBuilder();
 
         try {
             connection = ConnUtil.getConnection();
@@ -129,7 +129,7 @@ public class WordFrequencyDAO {
             selectStmt.setInt(1, num);
             results = selectStmt.executeQuery();
             while (results.next()) {
-                words.add(results.getString("word"));
+                words.append(results.getString("word")).append(' ');
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -146,7 +146,7 @@ public class WordFrequencyDAO {
             }
         }
 
-        return words;
+        return words.toString();
     }
 
     public void clearUp() throws SQLException {

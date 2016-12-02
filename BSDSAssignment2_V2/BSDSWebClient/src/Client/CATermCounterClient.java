@@ -9,8 +9,8 @@ import javax.ws.rs.core.Response;
  * Created by songyang on 11/23/16.
  */
 public class CATermCounterClient {
-//    private static final String serverURI = "http://localhost:8080/BSDSWebApplication/webresources/BSDS/";
-    private static final String serverURI = "http://54.89.76.7:8080/BSDSWebApplication/webresources/BSDS/";
+    private static final String serverURI = "http://localhost:8080/BSDSWebApplication/webresources/BSDS/";
+//    private static final String serverURI = "http://54.89.76.7:8080/BSDSWebApplication/webresources/BSDS/";
     private static final int N = 50;
 
     public static String getTopNPopularWords(int n) {

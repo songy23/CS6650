@@ -5,13 +5,26 @@
  */
 package org.BSDS;
 
-import JDBC.WordFrequencyDAO;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.Resource;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSConnectionFactory;
+import javax.jms.JMSContext;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.Queue;
+import javax.jms.Session;
+import javax.jms.TextMessage;
 
 /**
  *
@@ -19,12 +32,21 @@ import javax.ejb.Stateless;
  */
 @Stateless
 public class CAServer implements CAServerRemote {
+
     private static Map<String, ArrayList<String>> messagesByTopic = new ConcurrentHashMap<String, ArrayList<String>>();
     private static Map<Integer, Pair> subscriberidToTopicPositionMap = new HashMap<Integer, Pair>();  // don't need to be concurrent
     private static Map<Integer, String> publisheridToTopicMap = new HashMap<Integer, String>();
     private static Integer publisherID = 0;
     private static Integer subscriberID = 0;
-    private WordFrequencyDAO wordFrequencyDAO = WordFrequencyDAO.getInstance();
+    
+    @Resource(mappedName = "jms/MyQueue")
+    private Queue myQueue;
+
+    @Resource(mappedName = "ConnectionFactory")
+    private ConnectionFactory connectionFactory;
+    
+    @EJB
+    private WordCountSessionBeanRemote wordCountSessionBean;
 
     @Override
     public Integer registerPublisher(String topic, String name) {
@@ -85,12 +107,7 @@ public class CAServer implements CAServerRemote {
 
     @Override
     public String getTopNWords(int n) {
-        String terms = null;
-        try {
-            terms = wordFrequencyDAO.getTopNPopularWords(n);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        String terms = wordCountSessionBean.getTopNWords(n);
         return terms;
     }
     
@@ -101,10 +118,38 @@ public class CAServer implements CAServerRemote {
                 continue;
             } else {
                 try {
-                    wordFrequencyDAO.updateWordFrequency(word);
-                } catch (SQLException e) {
-                    e.printStackTrace();
+                    sendJMSMessageToMyQueue(message);
+                } catch (JMSException ex) {
+                    Logger.getLogger(CAServer.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            }
+        }
+    }
+
+    private Message createJMSMessageFormyQueue(Session session, Object messageData) throws JMSException {
+        TextMessage tm = session.createTextMessage();
+        tm.setText(messageData.toString());
+        return tm;
+    }
+
+    private void sendJMSMessageToMyQueue(Object messageData) throws JMSException {
+        Connection connection = null;
+        Session session = null;
+        try {
+            connection = connectionFactory.createConnection();
+            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            MessageProducer messageProducer = session.createProducer(myQueue);
+            messageProducer.send(createJMSMessageFormyQueue(session, messageData));
+        } finally {
+            if (session != null) {
+                try {
+                    session.close();
+                } catch (JMSException e) {
+                    Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Cannot close session", e);
+                }
+            }
+            if (connection != null) {
+                connection.close();
             }
         }
     }

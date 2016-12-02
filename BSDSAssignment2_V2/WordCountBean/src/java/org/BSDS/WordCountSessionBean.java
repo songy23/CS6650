@@ -5,6 +5,9 @@
  */
 package org.BSDS;
 
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.Singleton;
 
 /**
@@ -13,7 +16,25 @@ import javax.ejb.Singleton;
  */
 @Singleton
 public class WordCountSessionBean implements WordCountSessionBeanRemote {
+    private WordFrequencyDAO wordFrequencyDAO = WordFrequencyDAO.getInstance();
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
+    @Override
+    public void updateWordCount(String word) {
+        try {
+            wordFrequencyDAO.updateWordFrequency(word);
+        } catch (SQLException ex) {
+            Logger.getLogger(WordCountSessionBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Override
+    public String getTopNWords(int N) {
+        String terms = null;
+        try {
+            terms = wordFrequencyDAO.getTopNPopularWords(N);
+        } catch (SQLException ex) {
+            Logger.getLogger(WordCountSessionBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return terms;
+    }
 }

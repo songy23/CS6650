@@ -13,5 +13,9 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface WordCountSessionBeanRemote {
+
+    void updateWordCount(String word);
+
+    String getTopNWords(int N);
     
 }

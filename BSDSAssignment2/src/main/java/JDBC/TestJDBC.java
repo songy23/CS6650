@@ -47,7 +47,7 @@ public class TestJDBC {
 
 //        List<String> story = new ArrayList<String>();
 //
-//        File file = new File("/Users/songyang/Documents/CS6650/CS6650/BSDSAssignment2/src/main/java/JDBC/A tale of two cities");
+//        File file = new File("/Users/songyang/Documents/CS6650/CS6650/BSDSAssignment2/src/main/java/JDBC/stop_words");
 //        BufferedReader reader = null;
 //        try {
 //            reader = new BufferedReader(new FileReader(file));

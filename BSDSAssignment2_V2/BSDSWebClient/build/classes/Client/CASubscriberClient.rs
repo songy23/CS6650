@@ -1,2 +1,0 @@
-Client.SubClientThread
-Client.CASubscriberClient

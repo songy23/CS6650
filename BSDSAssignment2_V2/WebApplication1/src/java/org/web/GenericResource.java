@@ -114,13 +114,16 @@ public class GenericResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getMostPopularTerms(@PathParam("n") int n) {
-        return null;
+        return cAServer.getTopNWords(n);
     }
 
     private CAServerRemote lookupCAServerRemote() {
         try {
+//            System.setProperty("org.omg.CORBA.ORBInitialHost", "127.0.0.1");
+//            System.setProperty("org.omg.CORBA.ORBInitialPort", "3700");
             javax.naming.Context c = new InitialContext();
             return (CAServerRemote) c.lookup("java:global/BSDSEJBModule/CAServer!org.BSDS.CAServerRemote");
+//            return (CAServerRemote) c.lookup("java:comp/env/BSDSEJBModule/CAServer!org.BSDS.CAServerRemote");
         } catch (NamingException ne) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
             throw new RuntimeException(ne);

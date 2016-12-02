@@ -5,6 +5,8 @@
  */
 package org.BSDS;
 
+import JDBC.WordFrequencyDAO;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +24,7 @@ public class CAServer implements CAServerRemote {
     private static Map<Integer, String> publisheridToTopicMap = new HashMap<Integer, String>();
     private static Integer publisherID = 0;
     private static Integer subscriberID = 0;
+    private WordFrequencyDAO wordFrequencyDAO = WordFrequencyDAO.getInstance();
 
     @Override
     public Integer registerPublisher(String topic, String name) {
@@ -43,6 +46,8 @@ public class CAServer implements CAServerRemote {
         synchronized (messages) {
             messages.add(message);
         }
+        
+        wordFrequencyCounter(message);
     }
 
     @Override
@@ -75,6 +80,32 @@ public class CAServer implements CAServerRemote {
             return null;
         } else {
             return lastestContent;
+        }
+    }
+
+    @Override
+    public String getTopNWords(int n) {
+        String terms = null;
+        try {
+            terms = wordFrequencyDAO.getTopNPopularWords(n);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return terms;
+    }
+    
+    private void wordFrequencyCounter(String message) {
+        String[] words = message.split(" ");
+        for (String word : words) {
+            if (word.length() == 0 || StopWords.isStopWord(word)) {
+                continue;
+            } else {
+                try {
+                    wordFrequencyDAO.updateWordFrequency(word);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

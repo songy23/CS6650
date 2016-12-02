@@ -21,5 +21,7 @@ public interface CAServerRemote {
     Integer registerSubscriber(String topic);
 
     String getLatestContent(int subscriberID);
+
+    String getTopNWords(int n);
     
 }

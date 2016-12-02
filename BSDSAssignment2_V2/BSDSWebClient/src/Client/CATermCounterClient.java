@@ -9,7 +9,8 @@ import javax.ws.rs.core.Response;
  * Created by songyang on 11/23/16.
  */
 public class CATermCounterClient {
-    private static final String serverURI = "http://localhost:8080/BSDSWebApplication/webresources/BSDS/";
+//    private static final String serverURI = "http://localhost:8080/BSDSWebApplication/webresources/BSDS/";
+    private static final String serverURI = "http://54.89.76.7:8080/BSDSWebApplication/webresources/BSDS/";
     private static final int N = 50;
 
     public static String getTopNPopularWords(int n) {
@@ -39,4 +40,19 @@ public class CATermCounterClient {
     public static void main(String[] args) {
         printTerms(getTopNPopularWords(N));
     }
+}
+
+class TermCountThread implements Runnable {
+    private int N;
+    
+    public TermCountThread(int N) {
+        this.N = N;
+    }
+
+    @Override
+    public void run() {
+        String terms = CATermCounterClient.getTopNPopularWords(N);
+        CATermCounterClient.printTerms(terms);
+    }
+    
 }

@@ -11,7 +11,7 @@ import javax.ws.rs.core.Response;
  * Created by songyang on 11/20/16.
  */
 public class CASubscriberClient {
-    private static final String serverURI = "http://localhost:8080/BSDSWebApplication/webresources/BSDS/";
+    private static final String serverURI = "http://54.89.76.7:8080/BSDSWebApplication/webresources/BSDS/";
 
     public static int register(String topic) {
         Client client = ClientBuilder.newClient();

@@ -15,6 +15,7 @@ import java.util.Random;
  */
 public class CAPublisherClient {
     private static final String serverURI = "http://localhost:8080/BSDSWebApplication/webresources/BSDS/";
+//    private static final String serverURI = "http://54.89.76.7:8080/BSDSWebApplication/webresources/BSDS/";
 
     public static int register(String topic, String name) {
         Client client = ClientBuilder.newClient();

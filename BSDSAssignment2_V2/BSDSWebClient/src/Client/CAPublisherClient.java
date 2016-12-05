@@ -14,8 +14,8 @@ import java.util.Random;
  * Created by songyang on 11/20/16.
  */
 public class CAPublisherClient {
-    private static final String serverURI = "http://localhost:8080/BSDSWebApplication/webresources/BSDS/";
-//    private static final String serverURI = "http://54.89.76.7:8080/BSDSWebApplication/webresources/BSDS/";
+//    private static final String serverURI = "http://localhost:8080/BSDSWebApplication/webresources/BSDS/";
+    private static final String serverURI = "http://54.89.76.7:8080/BSDSWebApplication/webresources/BSDS/";
 
     public static int register(String topic, String name) {
         Client client = ClientBuilder.newClient();
@@ -44,7 +44,7 @@ public class CAPublisherClient {
 //        Scanner scan = new Scanner(System.in);
 //        System.out.println("Please specify how many publishers you want: ");
 //        int threadNum = scan.nextInt();
-        int threadNum = 3;
+        int threadNum = 20;
 
         for (int i = 0; i < threadNum; i++) {
 
@@ -54,7 +54,7 @@ public class CAPublisherClient {
 //            String name = scan.nextLine();
 //            System.out.println("Please specify how many messages this publisher should send: ");
 //            int messageNum = scan.nextInt();
-            PubClientThread thread = new PubClientThread("Topic" + i / 2, "Pub" + i, 10000);
+            PubClientThread thread = new PubClientThread("TopicB" + i / 2, "Pub" + i, 10000);
             new Thread(thread).start();
         }
     }

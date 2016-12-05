@@ -19,7 +19,7 @@ public class WordCountSessionBean implements WordCountSessionBeanRemote {
     private WordFrequencyDAO wordFrequencyDAO = WordFrequencyDAO.getInstance();
 
     @Override
-    public void updateWordCount(String word) {
+    public synchronized void updateWordCount(String word) {
         try {
             wordFrequencyDAO.updateWordFrequency(word);
         } catch (SQLException ex) {

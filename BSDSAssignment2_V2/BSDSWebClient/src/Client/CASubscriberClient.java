@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response;
  * Created by songyang on 11/20/16.
  */
 public class CASubscriberClient {
+//    private static final String serverURI = "http://localhost:8080/BSDSWebApplication/webresources/BSDS/";
     private static final String serverURI = "http://54.89.76.7:8080/BSDSWebApplication/webresources/BSDS/";
 
     public static int register(String topic) {
@@ -47,11 +48,11 @@ public class CASubscriberClient {
 //        Scanner scan = new Scanner(System.in);
 //        System.out.println("Please specify how many subscribers you want: ");
 //        int threadNum = scan.nextInt();
-        int threadNum = 2;
+        int threadNum = 10;
         for (int i = 0; i < threadNum; i++) {
 //            System.out.println("Please enter a topic for subscriber " + i + ": ");
 //            String topic = scan.nextLine();
-            SubClientThread thread = new SubClientThread("Topic" + i);
+            SubClientThread thread = new SubClientThread("TopicB" + i);
             new Thread(thread).start();
         }
     }
@@ -80,7 +81,7 @@ class SubClientThread implements Runnable {
                     Thread.sleep(INITIAL_WAITING_TIME * factor);
                     factor *= 2;
                     if (startTime != null && factor == 2) {
-                        System.out.println("Subscriber " + id + " runs for " + Long.toString(System.currentTimeMillis() - startTime));
+//                        System.out.println("Subscriber " + id + " runs for " + Long.toString(System.currentTimeMillis() - startTime));
 //                        break; // thread exits
                     }
                 } else {
@@ -88,9 +89,10 @@ class SubClientThread implements Runnable {
                     if (startTime == null) {
                         startTime = System.currentTimeMillis();
                     }
-                    if (messageCount % 1000 == 0) {
+                    if (messageCount % 10000 == 0) {
 //                        System.out.println(message + " " + message.length());
                         System.out.println("Subscriber " + id + " received " + messageCount + " messages");
+                        System.out.println("Subscriber " + id + " runs for " + Long.toString(System.currentTimeMillis() - startTime));
                     }
                     factor = 1;
                 }

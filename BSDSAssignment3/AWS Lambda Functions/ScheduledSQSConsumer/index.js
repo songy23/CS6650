@@ -21,12 +21,11 @@ var connection = mysql.createConnection({
   port     : port
 });
 
-connection.connect();
-
 // Your queue URL stored in the queueUrl environment variable
 const QUEUE_URL = process.env.queueUrl;
 const PROCESS_MESSAGE = 'process-message';
 const tableName = "WordCount";
+const dynamoTableName = "Words";
 
 function invokePoller(functionName, message) {
     const payload = {
@@ -45,24 +44,33 @@ function invokePoller(functionName, message) {
 
 
 function processMessage(message, callback) {
-    console.log(message);
+    // console.log(message);
 
     // TODO process message
-    
+    connection.connect();
+    if (message && message.Body) {
+        var i = 0;
+        var words = message.Body.split(" ");
+        for (var word in words) {
+            updateWordCount(word, i == words.length - 1);
+            i++;
+        }
+    }
 
     // delete message
     const params = {
         QueueUrl: QUEUE_URL,
         ReceiptHandle: message.ReceiptHandle,
     };
-    SQS.deleteMessage(params, (err) => callback(err, message));
+    // SQS.deleteMessage(params, (err) => callback(err, message));
+    callback(null, "Success");
 }
 
 function poll(functionName, callback) {
     const params = {
         QueueUrl: QUEUE_URL,
         MaxNumberOfMessages: 10,
-        VisibilityTimeout: 10,
+        VisibilityTimeout: 30,
     };
     // batch request messages
     SQS.receiveMessage(params, (err, data) => {
@@ -81,8 +89,38 @@ function poll(functionName, callback) {
     });
 }
 
+function updateWordCount(word, shoudlEndConnection) {
+    connection.query(
+        "SELECT Count FROM WordCount WHERE Word = ?",
+        [word],
+        function(err, res) {
+            console.log("Select statement", err, res);
+            if (res && res.length > 0) {
+                var count = res[0].Count;
+                connection.query(
+                    "UPDATE WordCount SET Count = ? WHERE Word = ?",
+                    [count + 1, word],
+                    function(err, res){
+                        console.log("Update statement", err, res);
+                    });
+            } else {
+                connection.query(
+                    "INSERT INTO WordCount (Word, Count) VALUES (?, ?)", 
+                    [word, 1], 
+                    function(err, res){
+                        console.log("Insert statement" ,err, res);
+                    });
+            }
+            
+            if (shoudlEndConnection) {
+                connection.end();
+            }
+        });
+}
+
 exports.handler = (event, context, callback) => {
     try {
+        // console.log("Received event, ", event);
         if (event.operation === PROCESS_MESSAGE) {
             // invoked by poller
             processMessage(event.message, callback);
